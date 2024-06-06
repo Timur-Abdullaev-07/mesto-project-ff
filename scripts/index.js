@@ -9,6 +9,7 @@ function addСard(card) {
     const cardNew = cardTemplate.querySelector('.card').cloneNode(true);
 
     cardNew.querySelector('.card__image').src = card.link;
+    cardNew.querySelector('.card__image').alt = `Фотография ${card.name}`;
     cardNew.querySelector('.card__title').textContent = card.name;
 
     cardNew.querySelector('.card__delete-button').addEventListener('click', deleteCard);
