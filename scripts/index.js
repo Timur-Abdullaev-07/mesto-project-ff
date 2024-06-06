@@ -8,21 +8,22 @@ const placesList = document.querySelector('.places__list');
 function addСard(card) {
     const cardNew = cardTemplate.querySelector('.card').cloneNode(true);
 
-    cardNew.querySelector('.card__image').src = card.link;
-    cardNew.querySelector('.card__image').alt = `Фотография ${card.name}`;
+    const cardImage = cardNew.querySelector('.card__image');
+    cardImage.src = card.link;
+    cardImage.alt = `Фотография ${card.name}`;
     cardNew.querySelector('.card__title').textContent = card.name;
 
-    cardNew.querySelector('.card__delete-button').addEventListener('click', deleteCard);
+    cardNew.querySelector('.card__delete-button').addEventListener('click', () => deleteCard(cardNew));
 
-    placesList.append(cardNew);
+    return cardNew;
 }
 
 // @todo: Функция удаления карточки
-function deleteCard(evt) {
-    evt.target.parentElement.remove();
+function deleteCard(card) {
+    card.remove();
 }
 
 // @todo: Вывести карточки на страницу
 initialCards.forEach(element => {
-    addСard(element);
+    placesList.append(addСard(element));
 });
