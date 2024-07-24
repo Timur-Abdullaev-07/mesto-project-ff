@@ -1,17 +1,16 @@
 // @todo: Функция закртытия попапа с помощью клика
 function clickClosedPopup(evt) {
     if(evt.target.classList.contains('popup_is-opened')) {
-        closedPopup(evt.target);
+        closePopup(evt.target);
     } else if (evt.target.classList.contains('popup__close')){
-        closedPopup(evt.target.parentElement.parentElement);
+        closePopup(evt.target.parentElement.parentElement);
     }
 }
 
 // @todo: Функция закрытие попапа с помощью Escape
 function escapeClosedPopup(evt) {
     if (evt.key === 'Escape') {
-        console.log(evt);
-        closedPopup(document.querySelector('.popup_is-opened'));
+        closePopup(document.querySelector('.popup_is-opened'));
     }
 }
 
@@ -25,7 +24,7 @@ function openPopup(popup) {
 
 
 // @todo: Функция закрытия попапа
-function closedPopup(popup) {
+function closePopup(popup) {
     popup.classList.remove('popup_is-opened');
     document.removeEventListener('click', clickClosedPopup);
     document.removeEventListener('keydown', escapeClosedPopup);
@@ -33,4 +32,4 @@ function closedPopup(popup) {
 
 
 
-export {openPopup, closedPopup};
+export {openPopup, closePopup};

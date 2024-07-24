@@ -53,13 +53,13 @@ const hasInvalidInput = (inputList) => {
 }; 
 
 // @todo: Функция включения кнопки
-const buttonAbled = (inactiveButtonClass, buttonElement) => {
+const enableButton = (inactiveButtonClass, buttonElement) => {
   buttonElement.disabled = false;
   buttonElement.classList.remove(inactiveButtonClass);
 };
 
 // @todo: Функция выключения кнопки
-const buttonDisabled = (inactiveButtonClass, buttonElement) => {
+const disableButton = (inactiveButtonClass, buttonElement) => {
   buttonElement.disabled = true;
   buttonElement.classList.add(inactiveButtonClass);
 };
@@ -67,9 +67,9 @@ const buttonDisabled = (inactiveButtonClass, buttonElement) => {
 // @todo: Функция переключение работы кнопки
 const toggleButtonState = (validationObj, inputList, buttonElement) => {
   if (hasInvalidInput(inputList)) {
-    buttonDisabled(validationObj.inactiveButtonClass, buttonElement);
+    disableButton(validationObj.inactiveButtonClass, buttonElement);
   } else {
-    buttonAbled(validationObj.inactiveButtonClass, buttonElement)
+    enableButton(validationObj.inactiveButtonClass, buttonElement)
   }
 }
 
@@ -79,8 +79,8 @@ const clearValidation = (form, validationObj) => {
   const buttonElement = form.querySelector(validationObj.submitButtonSelector)
   inputList.forEach((inputElement) => {
     hideInputError(form, validationObj.inputErrorClass, validationObj.errorClass, inputElement)
-    buttonDisabled(validationObj.inactiveButtonClass, buttonElement);
   })
+  disableButton(validationObj.inactiveButtonClass, buttonElement);
 }
 
 export {enableValidation, clearValidation};

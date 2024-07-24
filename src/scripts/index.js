@@ -1,9 +1,9 @@
 import '../pages/index.css';
-import {addСard, findMyLike, updatingLikes} from './card.js';
-import {openPopup, closedPopup} from './modal.js';
+import {createCard, hasMyLike, addClickLike} from './card.js';
+import {openPopup, closePopup} from './modal.js';
 import {enableValidation, clearValidation} from './validation.js';
 import {getInitialCards, getInitialMe, patchNewProfileName, patchNewProfileAvatar, postNewCard, deleteCardApi, putLike, deleteLike} from './api.js';
-import {newProfileFoto, newProfileName} from './profile.js';
+import {setNewProfilePhoto, setNewProfileName} from './profile.js';
 
 // @todo: Темплейт карточки
 const cardTemplate = document.querySelector('#card-template').content;
@@ -32,6 +32,14 @@ const buttonDeleteYes = popupTypeDeleteCard.querySelector('.popup__button');
 let myId = null;
 let deleteCardId;
 let deleteElement;
+const configValidation = {
+  formSelector: '.popup__form',
+  inputSelector: '.popup__input',
+  submitButtonSelector: '.popup__button',
+  inactiveButtonClass: 'popup__button_disabled',
+  inputErrorClass: 'popup__input_type_error',
+  errorClass: 'popup__error_visible'
+}
 
 // @todo: "Да" подверждение удаления
 buttonDeleteYes.addEventListener('click', deleteCard);
@@ -52,23 +60,16 @@ document.querySelector('.profile__add-button').addEventListener('click', () => {
 });
 
 // @todo: Включение валидации
-enableValidation({
-  formSelector: '.popup__form',
-  inputSelector: '.popup__input',
-  submitButtonSelector: '.popup__button',
-  inactiveButtonClass: 'popup__button_disabled',
-  inputErrorClass: 'popup__input_type_error',
-  errorClass: 'popup__error_visible'
-});
+enableValidation(configValidation);
 
 // @todo: Добаление массива карточек на страницу
 Promise.all([getInitialMe(), getInitialCards()])
-  .then((results) => {
-      myId = results[0]._id;
-      newProfileFoto(profileFoto, results[0]);
-      newProfileName(profileName, profileJob, results[0]);
-      results[1].forEach((card) => {
-        placesList.append(addСard(card, myId, openPopupDeleteCard, putLike, deleteLike, findMyLike, updatingLikes, openPopupImage));
+  .then(([profileData, cardsData]) => {
+      myId = profileData._id;
+      setNewProfilePhoto(profileFoto, profileData);
+      setNewProfileName(profileName, profileJob, profileData);
+      cardsData.forEach((card) => {
+        placesList.append(createCard(card, myId, openPopupDeleteCard, addClickLike, putLike, deleteLike, hasMyLike, openPopupImage));
       })
   })
   .catch((err) => {
@@ -85,12 +86,7 @@ function openPopupImage(evt) {
 
 // @todo: Функция открытия попапа для редактирования профиля
 function openPopupEdit() {
-    clearValidation(editFormElement, {
-        inputSelector: '.popup__input',
-        inputErrorClass: 'popup__input_type_error',
-        inactiveButtonClass: 'popup__button_disabled',
-        submitButtonSelector: '.popup__button'
-    })
+    clearValidation(editFormElement, configValidation)
     openPopup(popupTypeEdit);
     nameInput.value = profileName.textContent;
     jobInput.value = profileJob.textContent;
@@ -104,13 +100,13 @@ function addNewProfileName(evt) {
   renderLoaging(true, buttonSubmit);
   patchNewProfileName(nameInput.value, jobInput.value)
     .then((result) => {
-      newProfileName(profileName, profileJob, result);
+      setNewProfileName(profileName, profileJob, result);
     })
     .catch((err) => {
       console.log(err);
     })
     .finally(() => {
-      closedPopup(popupTypeEdit);
+      closePopup(popupTypeEdit);
       renderLoaging(false, buttonSubmit);
     }
     )
@@ -119,15 +115,10 @@ function addNewProfileName(evt) {
 
 // @todo: Функция открытия попапа для редактирования автара
 function openPopupAvatar() {
-  clearValidation(avatarForm, {
-      inputSelector: '.popup__input',
-      inputErrorClass: 'popup__input_type_error',
-      inactiveButtonClass: 'popup__button_disabled',
-      submitButtonSelector: '.popup__button'
-  })
+  clearValidation(avatarForm, configValidation);
   openPopup(popupTypeAvatar);
   avatarForm.addEventListener('submit', addNewAvatarFoto);
-  avatarInput.value = '';
+  avatarForm.reset();
 }
 
 // @todo: Функция обработки данных аватара
@@ -137,13 +128,13 @@ function addNewAvatarFoto (evt) {
   renderLoaging(true, buttonSubmit);
   patchNewProfileAvatar(avatarInput.value)
     .then((result) => {
-      newProfileFoto(profileFoto, result);
+      setNewProfilePhoto(profileFoto, result);
     })
     .catch((err) => {
       console.log(err);
     })
     .finally(() => {
-      closedPopup(popupTypeAvatar);
+      closePopup(popupTypeAvatar);
       renderLoaging(false, buttonSubmit);
     })
   avatarForm.removeEventListener('submit', addNewAvatarFoto);
@@ -151,16 +142,10 @@ function addNewAvatarFoto (evt) {
 
 // @todo: Функция открытия попапа для добавления картоки
 function openPopupAdd() {
-    clearValidation(newCardFormElement, {
-        inputSelector: '.popup__input',
-        inputErrorClass: 'popup__input_type_error',
-        inactiveButtonClass: 'popup__button_disabled',
-        submitButtonSelector: '.popup__button'
-    })
+    clearValidation(newCardFormElement, configValidation);
     openPopup(popupTypeNewCard);
     newCardFormElement.addEventListener('submit', addNewCard);
-    placeName.value = '';
-    placeUrl.value = '';
+    newCardFormElement.reset();
 }
 
 // @todo: Функция обработки данных новой карточки
@@ -170,13 +155,13 @@ function addNewCard(evt) {
     renderLoaging(true, buttonSubmit);
     postNewCard (placeName.value, placeUrl.value)
       .then((result) => {
-        placesList.prepend(addСard(result, myId, openPopupDeleteCard, putLike, deleteLike, findMyLike, updatingLikes, openPopupImage));
+        placesList.prepend(createCard(result, myId, openPopupDeleteCard, addClickLike, putLike, deleteLike, hasMyLike, openPopupImage));
       })
       .catch((err) => {
         console.log(err);
       })
       .finally(() => {
-        closedPopup(popupTypeNewCard);
+        closePopup(popupTypeNewCard);
         renderLoaging(false, buttonSubmit);
       })
     newCardFormElement.removeEventListener('submit', addNewCard);
@@ -199,16 +184,13 @@ function deleteCard() {
       console.log(err);
     })
     .finally(() => {
-      closedPopup(popupTypeDeleteCard);
+      closePopup(popupTypeDeleteCard);
     })
 }
 
 // @todo: Функция Cохранение...
-function renderLoaging(loaging, button) {
-  if(loaging) {
-    button.textContent = 'Сохранение...';
-  } else
-  button.textContent = 'Сохранить';
+function renderLoaging(isLoaging, button) {
+  button.textContent = isLoaging ? 'Сохранение...' : 'Сохранить';
 }
 
 export {cardTemplate};

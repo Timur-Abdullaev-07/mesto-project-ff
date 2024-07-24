@@ -1,10 +1,10 @@
-const newProfileFoto = (fotoElement, newFoto) => {
+const setNewProfilePhoto = (fotoElement, newFoto) => {
     fotoElement.style = `background-image: url(${newFoto.avatar});`
 }
 
-const newProfileName = (nameElement, jobElement, newData) => {
+const setNewProfileName = (nameElement, jobElement, newData) => {
     nameElement.textContent = newData.name;
     jobElement.textContent = newData.about;
 }
 
-export {newProfileFoto, newProfileName}
+export {setNewProfilePhoto, setNewProfileName}

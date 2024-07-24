@@ -66,12 +66,7 @@ const deleteCardApi = (cardId) => {
     method: 'DELETE',
     headers: config.headers
   })
-  .then((res) => {
-    if (res.ok) {
-      return Promise.resolve();
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
+  .then(handleResponse);
 };
 
 const putLike = (cardId) => {

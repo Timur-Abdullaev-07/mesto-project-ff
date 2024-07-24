@@ -1,7 +1,7 @@
 import { cardTemplate } from './index.js';
 
 // @todo: Функция создания карточки
-function addСard(card, myId, deleteCard, addLike, removeLike, findMyLike, updatingLikes, openPopupImage) {
+function createCard(card, myId, deleteCard, addClickLike, addLike, removeLike, findMyLike, openPopupImage) {
     const cardNew = cardTemplate.querySelector('.card').cloneNode(true);
 
     const cardImage = cardNew.querySelector('.card__image');
@@ -24,21 +24,7 @@ function addСard(card, myId, deleteCard, addLike, removeLike, findMyLike, updat
         likeButton.classList.add('card__like-button_is-active');
     }
 
-    likeButton.addEventListener('click', () => {
-        if(!findMyLike(card, myId)){
-            addLike(card._id)
-                .then((result) => {
-                    updatingLikes(numberLikesElement, result.likes.length, likeButton);
-                    card.likes = result.likes;
-                })
-        } else {
-            removeLike(card._id)
-                .then((result) => {
-                    updatingLikes(numberLikesElement, result.likes.length, likeButton);
-                    card.likes = result.likes;
-                })
-        }
-    });
+    likeButton.addEventListener('click', () => {addClickLike(card, myId, findMyLike, addLike, removeLike, numberLikesElement, likeButton)});
 
     cardImage.addEventListener('click', openPopupImage);
 
@@ -46,15 +32,19 @@ function addСard(card, myId, deleteCard, addLike, removeLike, findMyLike, updat
 }
 
 // @todo: Функция поиска своего лайка
-function findMyLike (card, myId) {
-    return card.likes.find(element => element._id === myId)
+function hasMyLike(card, myId) {
+    return card.likes.some(element => element._id === myId)
 }
 
-// @todo: Функция обновления количества лайков
-function updatingLikes (numberLikesElement, newNumderLikes, likeIcon) {
-    numberLikesElement.textContent = newNumderLikes;
-    likeIcon.classList.toggle('card__like-button_is-active');
+function addClickLike(card, myId, findMyLike, addLike, removeLike, numberLikesElement, likeButton) {
+    const likeMethod = findMyLike(card, myId) ? removeLike : addLike;
+    likeMethod(card._id) 
+        .then((result) => { 
+            numberLikesElement.textContent = result.likes.length;
+            likeButton.classList.toggle('card__like-button_is-active'); 
+            card.likes = result.likes; 
+            })
+        .catch(err => console.log(err));
 }
 
-
-export {addСard, findMyLike, updatingLikes};
+export {createCard, hasMyLike, addClickLike};
