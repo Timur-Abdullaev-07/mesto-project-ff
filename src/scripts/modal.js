@@ -3,7 +3,7 @@ function clickClosedPopup(evt) {
     if(evt.target.classList.contains('popup_is-opened')) {
         closePopup(evt.target);
     } else if (evt.target.classList.contains('popup__close')){
-        closePopup(evt.target.parentElement.parentElement);
+        closePopup(evt.target.closest('.popup_is-opened'));
     }
 }
 
